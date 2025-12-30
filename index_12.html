@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vlarix Pro Max Plus - Fixed</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0088cc;
+            --primary-gradient: linear-gradient(135deg, #0088cc 0%, #00aaff 100%);
+            --accent: #ff9500;
+            --bg: var(--tg-theme-bg-color, #ffffff);
+            --text: var(--tg-theme-text-color, #222222);
+            --hint: var(--tg-theme-hint-color, #999999);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f7);
+            --card-bg: var(--tg-theme-bg-color, #ffffff);
+            --glass: rgba(255, 255, 255, 0.7);
+            --success: #31b545;
+            --warning: #ff9500;
+            --danger: #ef5350;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        [data-theme="dark"] { --glass: rgba(0, 0, 0, 0.3); }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--secondary-bg);
+            color: var(--text);
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--bg);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .logo-container {
+            width: 45px; height: 45px;
+            background: var(--primary-gradient);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.4em;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+            position: relative; overflow: hidden;
+        }
+
+        .balance-badge {
+            background: var(--secondary-bg);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 800; cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .main-container { padding: 20px 16px 100px; }
+
+        .dashboard-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .summary-item { padding: 16px; text-align: center; }
+        .summary-item i { font-size: 1.5em; margin-bottom: 8px; display: block; color: var(--primary); }
+        .summary-label { font-size: 0.75em; color: var(--hint); display: block; }
+        .summary-value { font-weight: 800; font-size: 1.1em; }
+
+        .search-wrapper { position: relative; margin-bottom: 20px; }
+        .search-input {
+            width: 100%; padding: 16px 45px 16px 16px;
+            border-radius: 18px; border: none;
+            background: var(--bg); box-shadow: var(--shadow);
+            outline: none; font-size: 1em;
+        }
+        .search-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--hint); }
+
+        .category-card { margin-bottom: 15px; overflow: hidden; }
+        .category-trigger { padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .category-title { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.05em; }
+        .category-icon {
+            width: 32px; height: 32px;
+            background: rgba(0, 136, 204, 0.1);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);
+        }
+
+        .services-list { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: rgba(0,0,0,0.02); }
+        .category-card.open .services-list { max-height: 2000px; }
+        .category-card.open .fa-chevron-down { transform: rotate(180deg); }
+
+        .service-item { padding: 16px 20px; border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .service-info { flex: 1; }
+        .service-name { font-weight: 600; font-size: 0.95em; margin-bottom: 4px; display: block; }
+        .service-meta { font-size: 0.75em; color: var(--hint); }
+        .service-price { text-align: left; margin-right: 15px; }
+        .price-val { color: var(--primary); font-weight: 800; font-size: 1.1em; display: block; }
+
+        .order-btn {
+            background: var(--primary-gradient); color: white; border: none;
+            padding: 8px 18px; border-radius: 12px; font-weight: 700;
+            font-size: 0.85em; margin-top: 8px; cursor: pointer;
+        }
+
+        .nav-bar {
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            height: 70px; display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--hint); font-size: 0.7em; font-weight: 700; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 1.5em; }
+
+        .section { display: none; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4); display: none; align-items: flex-end;
+            z-index: 2000; backdrop-filter: blur(4px);
+        }
+        .bottom-sheet { width: 100%; background: var(--bg); border-radius: 32px 32px 0 0; padding: 30px 24px; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .styled-input { width: 100%; padding: 14px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.08); background: var(--secondary-bg); outline: none; color: var(--text); }
+        .confirm-btn { width: 100%; padding: 16px; border-radius: 18px; border: none; background: var(--primary-gradient); color: white; font-weight: 800; font-size: 1.1em; cursor: pointer; }
+
+        .error-banner { background: var(--danger); color: white; padding: 10px; text-align: center; font-size: 0.8em; display: none; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--hint); }
+        .empty-state i { font-size: 3em; margin-bottom: 15px; opacity: 0.3; }
+    </style>
+</head>
+<body>
+
+    <div id="error-banner" class="error-banner">
+        <i class="fas fa-exclamation-circle"></i> فشل تحميل الخدمات من السيرفر. يتم عرض بيانات احتياطية.
+    </div>
+
+    <div class="header">
+        <div class="brand">
+            <div class="logo-container"><i class="fas fa-bolt"></i></div>
+            <div>
+                <div style="font-weight: 900; font-size: 1.3em; letter-spacing: -0.5px;">VLARIX</div>
+                <div style="font-size: 0.65em; font-weight: 800; color: var(--primary); letter-spacing: 1px;">PRO MAX PLUS</div>
+            </div>
+        </div>
+        <div class="balance-badge" onclick="toggleCurrency()">
+            <i class="fas fa-wallet" style="color: var(--primary);"></i>
+            <span id="balance-val">0.00</span>
+            <span id="currency-label">$</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <div id="store-section" class="section active">
+            <div class="dashboard-summary">
+                <div class="glass-card summary-item">
+                    <i class="fas fa-layer-group"></i>
+                    <span class="summary-label">الفئات</span>
+                    <span id="cat-count" class="summary-value">0</span>
+                </div>
+                <div class="glass-card summary-item">
+                    <i class="fas fa-check-double"></i>
+                    <span class="summary-label">الخدمات</span>
+                    <span id="serv-count" class="summary-value">0</span>
+                </div>
+            </div>
+
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="ابحث عن خدمة..." id="search-input" oninput="renderStore()">
+            </div>
+
+            <div id="services-container">
+                <div style="text-align:center; padding:40px; color:var(--hint);"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</div>
+            </div>
+        </div>
+
+        <div id="orders-section" class="section">
+            <h2 style="margin-bottom: 20px; font-weight: 900;">سجل الطلبات</h2>
+            <div id="orders-container">
+                <div class="empty-state"><i class="fas fa-receipt"></i><p>لا توجد طلبات حالياً.</p></div>
+            </div>
+        </div>
+
+        <div id="profile-section" class="section">
+            <div style="text-align:center; margin-bottom:30px;">
+                <div style="width:80px; height:80px; background:var(--primary-gradient); border-radius:25px; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; color:white; font-size:2em; box-shadow:0 10px 20px rgba(0,136,204,0.2);">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <h2 id="user-name" style="margin:0; font-weight:900;">مستخدم Vlarix</h2>
+                <p id="user-id" style="color:var(--hint); font-size:0.8em;">ID: 00000000</p>
+            </div>
+
+            <div class="glass-card" style="padding:20px; text-align:center; margin-bottom:20px;">
+                <span style="font-size:0.8em; color:var(--hint);">الرصيد المتاح</span>
+                <div id="profile-balance" style="font-size:1.8em; font-weight:900; color:var(--primary);">0.00 $</div>
+            </div>
+
+            <div class="glass-card" style="padding:15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; margin-bottom:12px;" onclick="requestPayment()">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div style="width:40px; height:40px; background:rgba(49,181,69,0.1); color:var(--success); border-radius:12px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-plus"></i></div>
+                    <span style="font-weight:700;">شحن الرصيد</span>
+                </div>
+                <i class="fas fa-chevron-left" style="color:var(--hint);"></i>
+            </div>
+
+            <div class="glass-card" style="padding:15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="tg.close()">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <div style="width:40px; height:40px; background:rgba(239,83,80,0.1); color:var(--danger); border-radius:12px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-sign-out-alt"></i></div>
+                    <span style="font-weight:700;">خروج</span>
+                </div>
+                <i class="fas fa-chevron-left" style="color:var(--hint);"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card nav-bar">
+        <div class="nav-item active" onclick="switchTab('store', this)"><i class="fas fa-th-large"></i><span>المتجر</span></div>
+        <div class="nav-item" onclick="switchTab('orders', this)"><i class="fas fa-list-ul"></i><span>طلباتي</span></div>
+        <div class="nav-item" onclick="switchTab('profile', this)"><i class="fas fa-user"></i><span>حسابي</span></div>
+    </div>
+
+    <div class="modal-overlay" id="order-modal">
+        <div class="bottom-sheet">
+            <h3 id="modal-service-name" style="margin-top:0; font-weight:900;"></h3>
+            <p id="modal-service-desc" style="font-size:0.8em; color:var(--hint); margin-bottom:20px;"></p>
+            <div style="margin-bottom:15px;">
+                <label style="font-size:0.8em; font-weight:700; color:var(--hint);">الرابط</label>
+                <input type="text" id="order-link" class="styled-input" placeholder="https://...">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="font-size:0.8em; font-weight:700; color:var(--hint);">الكمية</label>
+                <input type="number" id="order-qty" class="styled-input" value="1000" oninput="calculateTotal()">
+            </div>
+            <div class="glass-card" style="padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:rgba(0,136,204,0.05);">
+                <span style="font-weight:700;">الإجمالي:</span>
+                <span id="modal-total-price" style="font-weight:900; font-size:1.3em; color:var(--primary);">0.00 $</span>
+            </div>
+            <button class="confirm-btn" onclick="submitOrder()">تأكيد الطلب</button>
+            <button style="width:100%; background:none; border:none; color:var(--hint); margin-top:15px;" onclick="closeModal()">إلغاء</button>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let currentCurrency = 'USD';
+        let exchangeRate = 1;
+        let userBalance = 0;
+        let allServices = [];
+        let selectedService = null;
+        let ordersHistory = [];
+
+        // بيانات احتياطية في حال فشل تحميل services.json (تجنب 404)
+        const fallbackServices = [
+            {id: 1, name: "متابعين انستقرام حقيقيين", category: "انستقرام", rate: 1.5, min: 100, max: 10000},
+            {id: 2, name: "لايكات تيك توك سريعة", category: "تيك توك", rate: 0.8, min: 500, max: 50000},
+            {id: 3, name: "مشاهدات يوتيوب مضمونة", category: "يوتيوب", rate: 2.2, min: 1000, max: 100000}
+        ];
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            userBalance = parseFloat(params.get('balance')) || 0;
+            exchangeRate = parseFloat(params.get('rate')) || 1;
+            
+            if(tg.initDataUnsafe?.user) {
+                document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
+                document.getElementById('user-id').innerText = "ID: " + tg.initDataUnsafe.user.id;
+            }
+
+            updateBalanceDisplay();
+            await loadServices();
+            loadLocalOrders();
+        }
+
+        async function loadServices() {
+            const container = document.getElementById('services-container');
+            try {
+                // محاولة تحميل الملف مع إضافة timestamp لتجنب الكاش
+                const response = await fetch('services.json?v=' + Date.now());
+                if (!response.ok) throw new Error('404');
+                allServices = await response.json();
+            } catch (e) {
+                console.warn("Using fallback data due to:", e.message);
+                allServices = fallbackServices;
+                document.getElementById('error-banner').style.display = 'block';
+            }
+            renderStore();
+        }
+
+        function renderStore() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const container = document.getElementById('services-container');
+            container.innerHTML = '';
+
+            const filtered = allServices.filter(s => s.name.toLowerCase().includes(query) || s.category.toLowerCase().includes(query));
+            const categories = filtered.reduce((acc, s) => { (acc[s.category] = acc[s.category] || []).push(s); return acc; }, {});
+
+            const catKeys = Object.keys(categories);
+            document.getElementById('cat-count').innerText = catKeys.length;
+            document.getElementById('serv-count').innerText = filtered.length;
+
+            if (catKeys.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><p>لا توجد نتائج.</p></div>`;
+                return;
+            }
+
+            catKeys.forEach(catName => {
+                const catCard = document.createElement('div');
+                catCard.className = 'glass-card category-card';
+                catCard.innerHTML = `
+                    <div class="category-trigger" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="category-title"><div class="category-icon"><i class="fas fa-star"></i></div><span>${catName}</span></div>
+                        <i class="fas fa-chevron-down" style="font-size:0.8em; color:var(--hint);"></i>
+                    </div>
+                    <div class="services-list">
+                        ${categories[catName].map(s => `
+                            <div class="service-item">
+                                <div class="service-info">
+                                    <span class="service-name">${s.name}</span>
+                                    <span class="service-meta">ID: ${s.id}</span>
+                                </div>
+                                <div class="service-price">
+                                    <span class="price-val">${formatPrice(s.rate)}</span>
+                                    <button class="order-btn" onclick="openOrderModal(${s.id})">طلب</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(catCard);
+            });
+        }
+
+        function formatPrice(usdPrice) {
+            const price = currentCurrency === 'USD' ? usdPrice : usdPrice * exchangeRate;
+            const symbol = currentCurrency === 'USD' ? '$' : 'ل.س';
+            return `${price.toLocaleString(undefined, {minimumFractionDigits: 2})} ${symbol}`;
+        }
+
+        function updateBalanceDisplay() {
+            const displayVal = currentCurrency === 'USD' ? userBalance : userBalance * exchangeRate;
+            const symbol = currentCurrency === 'USD' ? '$' : 'ل.س';
+            document.getElementById('balance-val').innerText = displayVal.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('currency-label').innerText = symbol;
+            document.getElementById('profile-balance').innerText = `${displayVal.toLocaleString(undefined, {minimumFractionDigits: 2})} ${symbol}`;
+        }
+
+        function toggleCurrency() {
+            currentCurrency = currentCurrency === 'USD' ? 'SYP' : 'USD';
+            updateBalanceDisplay();
+            renderStore();
+            renderOrders();
+        }
+
+        function switchTab(tab, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(tab + '-section').classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function openOrderModal(id) {
+            selectedService = allServices.find(s => s.id == id);
+            document.getElementById('modal-service-name').innerText = selectedService.name;
+            document.getElementById('modal-service-desc').innerText = `الحد الأدنى: ${selectedService.min} | الأقصى: ${selectedService.max}`;
+            document.getElementById('order-qty').value = selectedService.min;
+            calculateTotal();
+            document.getElementById('order-modal').style.display = 'flex';
+        }
+
+        function calculateTotal() {
+            const qty = document.getElementById('order-qty').value;
+            const totalUsd = (qty / 1000) * selectedService.rate;
+            document.getElementById('modal-total-price').innerText = formatPrice(totalUsd);
+        }
+
+        function closeModal() { document.getElementById('order-modal').style.display = 'none'; }
+
+        function submitOrder() {
+            const link = document.getElementById('order-link').value;
+            const qty = parseInt(document.getElementById('order-qty').value);
+            if (!link) { tg.showAlert('أدخل الرابط!'); return; }
+            
+            const orderData = { action: 'new_order', service_id: selectedService.id, service_name: selectedService.name, link: link, quantity: qty, cost: (qty / 1000) * selectedService.rate, date: new Date().toLocaleDateString('ar-EG'), status: 'pending' };
+            ordersHistory.unshift(orderData);
+            localStorage.setItem('vlarix_orders', JSON.stringify(ordersHistory.slice(0, 20)));
+            renderOrders();
+            tg.sendData(JSON.stringify(orderData));
+            closeModal();
+            tg.showAlert('تم إرسال الطلب بنجاح!');
+        }
+
+        function loadLocalOrders() {
+            const saved = localStorage.getItem('vlarix_orders');
+            if (saved) { ordersHistory = JSON.parse(saved); renderOrders(); }
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('orders-container');
+            if (ordersHistory.length === 0) return;
+            container.innerHTML = ordersHistory.map(order => `
+                <div class="glass-card" style="padding:15px; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-weight:800; font-size:0.9em;">${order.service_name}</span>
+                        <span style="font-size:0.7em; background:rgba(255,149,0,0.1); color:var(--warning); padding:2px 8px; border-radius:10px;">قيد الانتظار</span>
+                    </div>
+                    <div style="font-size:0.8em; color:var(--hint);">
+                        <div>الرابط: ${order.link.substring(0, 25)}...</div>
+                        <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                            <span>الكمية: ${order.quantity}</span>
+                            <span style="color:var(--primary); font-weight:700;">${formatPrice(order.cost)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function requestPayment() { tg.sendData(JSON.stringify({ action: 'request_payment' })); }
+
+        init();
+    </script>
+</body>
+</html>
